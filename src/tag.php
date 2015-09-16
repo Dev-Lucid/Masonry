@@ -1,8 +1,7 @@
 <?php
 
 
-namespace DevLucid;
-namespace DevLucid\Masonry;
+namespace html;
 
 class tag
 {

@@ -1,9 +1,8 @@
 <?php
 
+namespace html;
 
-namespace DevLucid\Masonry;
-
-class anchor extends tag
+class anchor extends html\tag
 {
     function __construct()
     {
