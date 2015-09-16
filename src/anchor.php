@@ -2,10 +2,12 @@
 
 namespace html;
 
-class anchor extends html\tag
+class anchor extends tag
 {
     function __construct()
     {
-        
+        parent::init();
+        $this->tag = 'a';
+        $this->add('test');
     }
 }
