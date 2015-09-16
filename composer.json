@@ -1,0 +1,21 @@
+{
+    "name": "devlucid/masonry",
+    "description": "A php library for generating html",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Mike Thorn",
+            "email": "mthorn@devlucid.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.2.0",
+        "psr/log": "~1.0"
+    },
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-4": { "DevLucid\\Masonry\\": "" }
+    }
+
+}
