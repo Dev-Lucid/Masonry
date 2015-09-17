@@ -17,13 +17,13 @@ class card_block extends tag
         $this->add_class('card-block');
         if (isset($this->title))
         {
-            $this->add('<h4 class="card-title">'.$this->title.'</h4>');
+            $this->add(new card_title($this->title));
         }
         unset($this->title);
 
         if (isset($this->subtitle))
         {
-            $this->add('<h6 class="card-subtitle text-muted">'.$this->subtitle.'</h6>');
+            $this->add(new card_subtitle($this->subtitle));
         }
         unset($this->subtitle);
 

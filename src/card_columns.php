@@ -2,12 +2,12 @@
 
 namespace html;
 
-class card_header extends tag
+class card_columns extends tag
 {
     protected $_tag = 'div';
 
     function defaults()
     {
-        $this->add_class('card-header');
+        $this->add_class('card-columns');
     }
 }
