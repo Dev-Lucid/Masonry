@@ -27,6 +27,12 @@ class blockquote extends tag
             unset($this->reverse);
         }
 
+        if (!is_null($this->_parent) and $this->_parent->has_class('card-block'))
+        {
+            $this->remove_class('blockquote');
+            $this->add_class('card-blockquote');
+        }
+
         return parent::__toString();
     }
 }

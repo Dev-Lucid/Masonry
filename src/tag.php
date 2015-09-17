@@ -176,15 +176,21 @@ class tag
             }
             else
             {
-                $html .= '>'.$this->_pre_children_html;
-                foreach($this->_children as $child)
-                {
-                    $html .= (string) $child;
-                }
-                $html .= $this->_post_children_html.'</'.$this->_tag.'>';
+                $html .= '>'.$this->_render_children().'</'.$this->_tag.'>';
             }
         }
         return $html.$this->_post_html;
+    }
+
+    protected function _render_children()
+    {
+        $html = $this->_pre_children_html;
+        foreach($this->_children as $child)
+        {
+            $html .= (string) $child;
+        }
+        $html .= $this->_post_children_html;
+        return $html;
     }
 
     public function add($new_child)
@@ -209,13 +215,31 @@ class tag
         return $this;
     }
 
+    public function _set_modifier($new_modifier)
+    {
+        return $this->modifier($new_modifier);
+    }
+
+    public function _get_modifier()
+    {
+        $modifiers = ['active','success','warning','info','danger','secondary'];
+        $class = $this->_attributes['class'];
+        foreach($modifiers as $modifier)
+        {
+            if(in_array($this->_modifier_prefix.'-'.$modifier,$class))
+            {
+                return $modifier;
+            }
+        }
+    }
+
     public function modifier($new_modifier)
     {
         if (is_null($this->_modifier_prefix))
         {
             throw new \Exception(get_class($this). ' does not support modifiers.');
         }
-        $modifiers = ['active','success','warning','info','danger'];
+        $modifiers = ['active','success','warning','info','danger','secondary'];
         foreach($modifiers as $remove)
         {
             if ($new_modifier !== $remove)
@@ -229,11 +253,98 @@ class tag
 
     public function clear_modifier()
     {
-        $modifiers = ['active','success','warning','info','danger'];
+        $modifiers = ['active','success','warning','info','danger','secondary'];
         foreach($modifiers as $remove)
         {
             $this->remove_class($this->_modifier_prefix.'-'.$remove);
         }
+    }
+
+    public function _set_size($new_size)
+    {
+        return $this->size($new_size);
+    }
+
+    public function _get_size()
+    {
+        $sizes = ['sm','lg'];
+        $class = $this->_attributes['class'];
+        foreach($sizes as $size)
+        {
+            if(in_array($this->_size_prefix.'-'.$size,$class))
+            {
+                return $size;
+            }
+        }
+    }
+
+    public function size($new_size)
+    {
+        if (is_null($this->_size_prefix))
+        {
+            throw new \Exception(get_class($this). ' does not support sizes.');
+        }
+        $sizes = ['sm','lg'];
+        foreach($sizes as $remove)
+        {
+            if ($new_size !== $remove)
+            {
+                $this->remove_class($this->_size_prefix.'-'.$remove);
+            }
+        }
+        $this->add_class($this->_size_prefix.'-'.$new_size);
+        return $this;
+    }
+
+    public function _set_active($new_state)
+    {
+        if ($new_state === true)
+        {
+            $this->add_class('active');
+        }
+        else
+        {
+            $this->remove_class('active');
+        }
+        return $this;
+    }
+
+    public function _set_disabled($new_state)
+    {
+        if ($new_state === true)
+        {
+            $this->_attributes['disabled'] = 'disabled';
+        }
+        else
+        {
+            unset($this->_attributes['disabled']);
+        }
+        return $this;
+    }
+
+    public function _set_align($new_value)
+    {
+        $this->align($new_value);
+    }
+
+    function align($new_value)
+    {
+        if($new_value == 'left')
+        {
+            $this->remove_class('text-center');
+            $this->remove_class('text-right');
+        }
+        else if ($new_value == 'center')
+        {
+            $this->add_class('text-center');
+            $this->remove_class('text-right');
+        }
+        else if ($new_value == 'right')
+        {
+            $this->remove_class('text-center');
+            $this->add_class('text-right');
+        }
+        return $this;
     }
 
     public function parent()
