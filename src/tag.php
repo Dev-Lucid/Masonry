@@ -108,7 +108,7 @@ class tag
     
     public function has_class($name)
     {
-        if (isset($this->class))
+        if (!isset($this->_attributes['class']))
         {
             $this->_attributes['class'] = [];
         }
@@ -267,7 +267,7 @@ class tag
 
     public function _get_size()
     {
-        $sizes = ['sm','lg'];
+        $sizes = ['xs','sm','md','lg','xl'];
         $class = $this->_attributes['class'];
         foreach($sizes as $size)
         {
@@ -284,7 +284,7 @@ class tag
         {
             throw new \Exception(get_class($this). ' does not support sizes.');
         }
-        $sizes = ['sm','lg'];
+        $sizes = ['xs','sm','md','lg','xl'];
         foreach($sizes as $remove)
         {
             if ($new_size !== $remove)
@@ -347,9 +347,150 @@ class tag
         return $this;
     }
 
+    public function _set_grid_size($sizes=[])
+    {
+        $this->grid_size($sizes);
+    }
+
+    public function grid_size($new_sizes)
+    {
+        $sizes = ['xs','sm','md','lg','xl'];
+        if (!isset($this->_attributes['class']))
+        {
+            $this->_attributes['class'] = [];
+        }
+        $classes = $this->_attributes['class'];
+        foreach($classes as $class)
+        {
+            foreach($sizes as $size)
+            {
+                if (strpos($class,'col-'.$size.'-') !== false)
+                {
+                    $this->remove_class($class);
+                }
+            }
+        }
+
+        for($i=0; $i<count($new_sizes); $i++)
+        {
+            if (!is_null($new_sizes[$i]))
+            {
+                $this->add_class('col-'.$sizes[$i].'-'.$new_sizes[$i]);
+            }
+        }
+        return $this;
+    }
+
+    public function _set_grid_offset($sizes=[])
+    {
+        $this->grid_size($sizes);
+    }
+
+    public function grid_offset($new_offsets)
+    {
+        $sizes = ['xs','sm','md','lg','xl'];
+        if (!isset($this->_attributes['class']))
+        {
+            $this->_attributes['class'] = [];
+        }
+        $classes = $this->_attributes['class'];
+        foreach($classes as $class)
+        {
+            foreach($sizes as $size)
+            {
+                if (strpos($class,'col-'.$size.'-offset-') !== false)
+                {
+                    $this->remove_class($class);
+                }
+            }
+        }
+
+        for($i=0; $i<count($new_offsets); $i++)
+        {
+            if (!is_null($new_offsets[$i]))
+            {
+                $this->add_class('col-'.$sizes[$i].'-offset-'.$new_offsets[$i]);
+            }
+        }
+        return $this;
+    }
+
+    public function _set_grid_push($sizes=[])
+    {
+        $this->grid_size($sizes);
+    }
+
+    public function grid_push($new_pushes)
+    {
+        $sizes = ['xs','sm','md','lg','xl'];
+        if (!isset($this->_attributes['class']))
+        {
+            $this->_attributes['class'] = [];
+        }
+        $classes = $this->_attributes['class'];
+        foreach($classes as $class)
+        {
+            foreach($sizes as $size)
+            {
+                if (strpos($class,'col-'.$size.'-push-') !== false)
+                {
+                    $this->remove_class($class);
+                }
+            }
+        }
+
+        for($i=0; $i<count($new_pushes); $i++)
+        {
+            if (!is_null($new_pushes[$i]))
+            {
+                $this->add_class('col-'.$sizes[$i].'-push-'.$new_pushes[$i]);
+            }
+        }
+        return $this;
+    }
+
+    public function _set_grid_pull($sizes=[])
+    {
+        $this->grid_size($sizes);
+    }
+
+    public function grid_pull($new_pulls)
+    {
+        $sizes = ['xs','sm','md','lg','xl'];
+        if (!isset($this->_attributes['class']))
+        {
+            $this->_attributes['class'] = [];
+        }
+        $classes = $this->_attributes['class'];
+        foreach($classes as $class)
+        {
+            foreach($sizes as $size)
+            {
+                if (strpos($class,'col-'.$size.'-pull-') !== false)
+                {
+                    $this->remove_class($class);
+                }
+            }
+        }
+
+        for($i=0; $i<count($new_pulls); $i++)
+        {
+            if (!is_null($new_pulls[$i]))
+            {
+                $this->add_class('col-'.$sizes[$i].'-pull-'.$new_pulls[$i]);
+            }
+        }
+        return $this;
+    }
+
     public function parent()
     {
         return $this->_parent;
+    }
+
+    public function tag()
+    {
+        return $this->_tag;
     }
 
     public function first_child()
