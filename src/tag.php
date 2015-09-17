@@ -5,24 +5,152 @@ namespace html;
 
 class tag
 {
-    public function init()
+    protected $_tag                = null;
+    protected $_children           = [];
+    protected $_parent             = null;
+    protected $_allow_quick_close  = false;
+    protected $_attributes         = [];
+    protected $_pre_html           = '';
+    protected $_post_html          = '';
+    protected $_pre_children_html  = '';
+    protected $_post_children_html = '';
+    protected $_modifier_prefix    = null;
+
+    public function __construct($text_or_config=[], $config_if_text_is_set=[])
     {
-        $this->tag               = null;
-        $this->attributes        = [];
-        $this->children          = [];
-        $this->parent            = null;
-        $this->allow_quick_close = false;
+        $this->init($text_or_config, $config_if_text_is_set);
+    }
+
+    public function init($text_or_config=[], $config_if_text_is_set=[])
+    {
+        if (!is_array($text_or_config))
+        {
+            $this->add($text_or_config);
+            $config = $config_if_text_is_set;
+        }
+        else
+        {
+            $config = $text_or_config; 
+        }
+
+        $this->defaults();
+        foreach($config as $key=>$value)
+        {
+            if ($key == 'text')
+            {
+                $this->add($value);
+            }
+            else
+            {
+                $this->$key = $value;    
+            }
+        }
+    }
+
+    # empty, overridden 
+    public function defaults()
+    {
+        
+    }
+
+    public function __set($name,$value)
+    {
+        $method_name = '_set_'.$name;
+        if(method_exists($this,$method_name) === true)
+        {
+            $this->$method_name($value);
+        } 
+        else
+        {
+            $this->_attributes[$name] = $value;
+        }
+    }
+
+    public function __get($name)
+    {
+        $method_name = '_get_'.$name;
+        if(method_exists($this,$method_name) === true)
+        {
+            return $this->$method_name();
+        } 
+        else
+        {
+            return $this->_attributes[$name];
+        }
+    }
+
+    public function __isset($name)
+    {
+        $method_name = '_isset_'.$name;
+        if(method_exists($this,$method_name) === true)
+        {
+            return $this->$method_name();
+        } 
+        else
+        {
+            return isset($this->_attributes[$name]);
+        }
+    }
+
+    public function __unset($name)
+    {
+        $method_name = '_unset_'.$name;
+        if(method_exists($self,$method_name) === true)
+        {
+            $this->$method_name();
+        } 
+        else
+        {
+            unset($this->_attributes[$name]);
+        }
+    }
+
+    
+    public function has_class($name)
+    {
+        if (isset($this->class))
+        {
+            $this->_attributes['class'] = [];
+        }
+        return in_array($name,$this->_attributes['class']);
+    }
+
+    public function remove_class($name)
+    {
+        if (!isset($this->_attributes['class']))
+        {
+            $this->_attributes['class'] = [];
+        }
+        $this->_attributes['class'] = array_diff($this->_attributes['class'], [$name]);
+        return $this;
+    }
+
+    public function add_class($name)
+    {
+        if (!isset($this->_attributes['class']))
+        {
+            $this->_attributes['class'] = [];
+        }
+        $this->_attributes['class'][] = $name;
+        return $this;
+    }
+
+    public function _get_class()
+    {
+        return implode(' ',array_unique($this->_attributes['class']));
+    }
+
+    public function _set_class($value)
+    {
+        $this->add_class($value);
     }
 
     protected function _build_attributes()
     {
         $html = '';
-        foreach($this->attributes as $key=>$value)
+        foreach($this->_attributes as $key => $value)
         {
-            if (is_array($value))
-            {
-                $value = implode(' ',$value);
-            }
+            $value = $this->__get($key);
             $html .= ' '.$key.'="'.$value.'"';
         }
         return $html;
@@ -30,31 +158,106 @@ class tag
 
     function __toString()
     {
-        $html = '<'.$this->tag.$this->_build_attributes();
-
-        if(count($this->children) == 0 and $this->allow_quick_close === true)
+        if (is_null($this->_tag))
         {
-            $html .= ' />';
-        }
-        else
-        {
-            $html .= '>';
-            foreach($this->children as $child)
+            $html = $this->_pre_html;
+            foreach($this->_children as $child)
             {
                 $html .= (string) $child;
             }
-            $html .= '</'.$this->tag.'>';
         }
-        return $html;
+        else
+        {
+            $html = $this->_pre_html.'<'.$this->_tag.$this->_build_attributes();
+
+            if(count($this->_children) == 0 and $this->_allow_quick_close === true)
+            {
+                $html .= ' />';
+            }
+            else
+            {
+                $html .= '>'.$this->_pre_children_html;
+                foreach($this->_children as $child)
+                {
+                    $html .= (string) $child;
+                }
+                $html .= $this->_post_children_html.'</'.$this->_tag.'>';
+            }
+        }
+        return $html.$this->_post_html;
     }
 
     public function add($new_child)
     {
         if (is_object($new_child))
         {
-            $new_child->parent = $this;
+            $new_child->_parent = $this;
         }
-        $this->children[] = $new_child;
+        $this->_children[] = $new_child;
         return $this;
+    }
+
+    public function pull_right()
+    {
+        $this->add_class('pull-right');
+        return $this;
+    }
+
+    public function pull_left()
+    {
+        $this->add_class('pull-left');
+        return $this;
+    }
+
+    public function modifier($new_modifier)
+    {
+        if (is_null($this->_modifier_prefix))
+        {
+            throw new \Exception(get_class($this). ' does not support modifiers.');
+        }
+        $modifiers = ['active','success','warning','info','danger'];
+        foreach($modifiers as $remove)
+        {
+            if ($new_modifier !== $remove)
+            {
+                $this->remove_class($this->_modifier_prefix.'-'.$remove);
+            }
+        }
+        $this->add_class($this->_modifier_prefix.'-'.$new_modifier);
+        return $this;
+    }
+
+    public function clear_modifier()
+    {
+        $modifiers = ['active','success','warning','info','danger'];
+        foreach($modifiers as $remove)
+        {
+            $this->remove_class($this->_modifier_prefix.'-'.$remove);
+        }
+    }
+
+    public function parent()
+    {
+        return $this->_parent;
+    }
+
+    public function first_child()
+    {
+        return $this->_children[0];
+    }
+
+    public function last_child()
+    {
+        return $this->_children[(count($this->_children) - 1)];
+    }
+
+    public function nth_child($nbr)
+    {
+        return $this->_children[$nbr];
+    }
+
+    public function count_children()
+    {
+        return count($this->children);
     }
 }
