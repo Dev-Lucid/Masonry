@@ -24,8 +24,8 @@ class blockquote extends tag
         if($this->reverse === true)
         {
             $this->add_class('blockquote-reverse');
-            unset($this->reverse);
         }
+        unset($this->reverse);
 
         if (!is_null($this->_parent) and $this->_parent->has_class('card-block'))
         {
