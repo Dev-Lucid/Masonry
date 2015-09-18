@@ -2,79 +2,41 @@
 
 namespace html;
 
-class input extends tag
+class input extends input_raw
 {
-    public function find_form()
+    protected function _render_addons()
     {
-        $current = $this;
-        $loop   = true;
-        while($loop == true)
+        if (isset($this->prefix) or isset($this->suffix))
         {
-            $current = $current->parent();
-            if(is_null($current))
+            $this->_pre_html = $this->_pre_html . '<div class="input-group">';
+            $this->_post_html = '</div>'.$this->_post_html;
+            if (isset($this->prefix))
             {
-                return false;
+                $this->_pre_html  = $this->_pre_html . '<span class="input-group-addon">'.$this->prefix.'</span>';
             }
-            else
+            if (isset($this->suffix))
             {
-                if($current->tag() == 'form')
-                {
-                    $loop = false;
-                }
+                $this->_post_html = '<span class="input-group-addon">'.$this->suffix.'</span>'.$this->_post_html;
             }
-        }
-        return $current;
-    }
-
-    protected function _determine_name()
-    {
-        $name_or_id = null;
-        $name_or_id = (isset($this->name))?$this->name:null;
-        $name_or_id = (isset($this->id))?$this->id:$this->name_or_id;
-        return $name_or_id;
-    }
-
-    protected function _render_label($name,$inline = false)
-    {
-        if (isset($this->label))
-        {
-            $label = new label();
-            $label->text = $this->label;
-
-            # labels are for screen-readers only if form is inline
-            if ($inline === true)
-            {
-                $label->add_class('sr-only');
-            }
-
-            if (!is_null($name))
-            {
-                $label->for = $name;
-            }
-
-            unset($this->label);
-            return(string) $label;
         }
     }
 
-    protected function _render_help($inline = false)
+    protected function _render_form_group($inline = false, $type = 'text', $use_grid = false)
     {
-        if (isset($this->help))
+        if ( $type === 'text' or $use_grid === true)
         {
-            $help = new small();
-            $help->add_class('text-muted');
-            $help->add($this->help);
-            
-            unset($this->help);
-            return (string) $help;
-            
-        }
-    }
+            $tag = ($inline == false and $use_grid == false)?'fieldset':'div';
+            #echo('type is '.$type.', adding form-group '.$tag."\n");
 
-    protected function _render_form_group($inline = false)
-    {
-        $tag = ($inline == true)?'div':'fieldset';
-        $this->_pre_html  = '<'.$tag.' class="form-group">'.$this->_pre_html;
-        $this->_post_html = $this->_post_html . '</'.$tag.'>';
+            $this->_pre_html  = '<'.$tag.' class="form-group'.(($use_grid == true)?' row':'').'">'.$this->_pre_html;
+            $this->_post_html = $this->_post_html . '</'.$tag.'>';
+        }
+        
+        if ($type === 'radio' or $type === 'checkbox')
+        {
+            $disabled = ($this->disabled === true)?' disabled':'';
+            $this->_pre_html  = $this->_pre_html.'<div class="'.$type. $disabled.'"><label>';
+            $this->_post_html = ' '.$this->label.'</label></div>'.$this->_post_html;
+        }
     }
 }

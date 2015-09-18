@@ -2,15 +2,15 @@
 
 namespace html;
 
-class input_text extends input
+class input_textarea extends input
 {
-    protected $_tag = 'input';
+    protected $_tag = 'textarea';
     protected $_allow_quick_close = true;
 
     public function defaults()
     {
         $this->add_class('form-control');
-        $this->type = 'text';
+        $this->rows = 3;
     }
 
     public function __toString()
@@ -18,8 +18,6 @@ class input_text extends input
         $identifier = $this->_determine_name();
         list($is_inline,$use_grid) = $this->_determine_form_settings();       
 
-        $this->placeholder = strip_tags($this->label);
-        $this->_render_addons();
         $this->_post_html = $this->_post_html.$this->_render_help($is_inline);
 
         if ($use_grid === true)
@@ -31,6 +29,12 @@ class input_text extends input
         $this->_pre_html  = $this->_render_label($identifier,$is_inline,$use_grid).$this->_pre_html;
 
         $this->_render_form_group($is_inline,'text',$use_grid);
+
+        if (isset($this->value))
+        {
+            $this->add($this->value);
+            unset($this->value);
+        }
 
         return parent::__toString();
     }

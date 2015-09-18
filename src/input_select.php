@@ -2,15 +2,30 @@
 
 namespace html;
 
-class input_text extends input
+class input_select extends input
 {
-    protected $_tag = 'input';
-    protected $_allow_quick_close = true;
+    protected $_tag = 'select';
 
     public function defaults()
     {
+        $this->add_class('c-select');
         $this->add_class('form-control');
-        $this->type = 'text';
+    }
+
+    public function _set_options($options)
+    {
+        foreach($options as $option)
+        {
+            $selected = ($option[0] == $this->value);
+            $this->add(new option([
+                'value'=>$option[0],
+                'text' =>$option[1],
+            ]));
+            if ($selected == true)
+            {
+                $this->last_child()->selected = 'selected';
+            }
+        }
     }
 
     public function __toString()
@@ -18,8 +33,8 @@ class input_text extends input
         $identifier = $this->_determine_name();
         list($is_inline,$use_grid) = $this->_determine_form_settings();       
 
-        $this->placeholder = strip_tags($this->label);
-        $this->_render_addons();
+        #$this->placeholder = strip_tags($this->label);
+        #$this->_render_addons();
         $this->_post_html = $this->_post_html.$this->_render_help($is_inline);
 
         if ($use_grid === true)

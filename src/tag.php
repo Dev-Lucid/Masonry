@@ -222,7 +222,7 @@ class tag
 
     public function _get_modifier()
     {
-        $modifiers = ['active','success','warning','info','danger','secondary'];
+        $modifiers = ['default','active','success','warning','info','danger','secondary'];
         $class = $this->_attributes['class'];
         foreach($modifiers as $modifier)
         {
@@ -239,7 +239,7 @@ class tag
         {
             throw new \Exception(get_class($this). ' does not support modifiers.');
         }
-        $modifiers = ['active','success','warning','info','danger','secondary'];
+        $modifiers = ['default','active','success','warning','info','danger','secondary'];
         foreach($modifiers as $remove)
         {
             if ($new_modifier !== $remove)
