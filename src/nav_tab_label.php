@@ -2,9 +2,18 @@
 
 namespace html;
 
-class anchor extends tag
+class nav_tab_label extends tag
 {
     protected $_tag = 'a';
+
+    public function defaults()
+    {
+        $this->_pre_html  = '<li class="nav-item">';
+        $this->_post_html = '</li>';
+        $this->add_class('nav-link');
+        $this->role = 'tab';
+        $this->__set('data-toggle','tab');
+    }
 
     public function __toString()
     {
