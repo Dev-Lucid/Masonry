@@ -150,21 +150,26 @@ class tag
         $html = '';
         foreach($this->_attributes as $key => $value)
         {
-            $value = $this->__get($key);
-            $html .= ' '.$key.'="'.$value.'"';
+            if (strpos($key,'_') !== 0)
+            {
+                $value = $this->__get($key);
+                $html .= ' '.$key.'="'.$value.'"';
+            }
         }
         return $html;
+    }
+
+    public function set_parent_accessor($accessor)
+    {
+        $this->parent()->_attributes[$accessor] =& $this;
+        return $this;
     }
 
     function __toString()
     {
         if (is_null($this->_tag))
         {
-            $html = $this->_pre_html;
-            foreach($this->_children as $child)
-            {
-                $html .= (string) $child;
-            }
+            $html = $this->_pre_html . $this->_render_children();
         }
         else
         {
